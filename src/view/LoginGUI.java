@@ -1,6 +1,9 @@
 package view;
 
+import view.aluno.AlunoListPanel;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -9,8 +12,21 @@ public class LoginGUI {
     private JTextField inputUsuario;
     private JPasswordField inputSenha;
     private JButton loginButton;
+    private JLabel Logo;
 
     public LoginGUI() {
+        // Carregar a logo e definir no JLabel
+        try {
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("../images/Captura de tela 2023-11-27 075813.png"));
+            Image originalImage = originalIcon.getImage();
+            // Redimensiona a imagem (exemplo para 100x100 pixels)
+            Image resizedImage = originalImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            ImageIcon resizedIcon = new ImageIcon(resizedImage);
+            Logo.setIcon(resizedIcon); // Define a imagem redimensionada no JLabel
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar a imagem da logo: " + e.getMessage());
+        }
+
         // Ação do botão de login
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -20,13 +36,15 @@ public class LoginGUI {
 
                 // Simulação de autenticação
                 if (autenticarUsuario(usuario, senha)) {
-                    // Se o login for bem-sucedido, abre a tela Home
-                    JFrame homeFrame = new JFrame("Tela Principal");
-                    HomeGUI homeGUI = new HomeGUI();  // Cria a tela Home
-                    homeFrame.setContentPane(homeGUI.getPanelMain());
-                    homeFrame.setSize(600, 400);
-                    homeFrame.setLocationRelativeTo(null); // Centraliza a janela
-                    homeFrame.setVisible(true);
+                    // Se o login for bem-sucedido, abre a tela de Alunos
+                    JFrame alunoFrame = new JFrame("Lista de Alunos");
+                    AlunoListPanel alunoListPanel = new AlunoListPanel();  // Cria o painel de Alunos
+
+                    // Definir o painel da AlunoListPanel como o conteúdo da nova janela
+                    alunoFrame.setContentPane(alunoListPanel);
+                    alunoFrame.setSize(800, 600);
+                    alunoFrame.setLocationRelativeTo(null); // Centraliza a janela
+                    alunoFrame.setVisible(true);
 
                     // Fecha a tela de login após o sucesso
                     SwingUtilities.getWindowAncestor(panelMain).dispose();
@@ -52,7 +70,7 @@ public class LoginGUI {
         JFrame loginFrame = new JFrame("Login");
         LoginGUI loginGUI = new LoginGUI();
         loginFrame.setContentPane(loginGUI.getPanelMain());
-        loginFrame.setSize(400, 200);
+        loginFrame.setSize(600, 400);
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginFrame.setLocationRelativeTo(null); // Centraliza a janela
         loginFrame.setVisible(true);

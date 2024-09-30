@@ -6,26 +6,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+    private static final String URL = "jdbc:mysql://localhost:3306/academia"; // Substitua pela sua URL do banco de dados
+    private static final String USER = "root";  // Seu usuário do banco
+    private static final String PASSWORD = "admin123";
 
-    private static Connection conexao = null;
-
-    public static Connection getConnection()
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NamingException {
-
-        String url = "jdbc:mysql://localhost:3306/escola";
-        String user = "root";
-        String password = "";
-        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-        conexao = DriverManager.getConnection(url, user, password);
-        return conexao;
-    }
-
-    public static void close() {
+    public static Connection getConnection() {
         try {
-            conexao.close();
+            return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Erro ao conectar ao banco de dados", e);
         }
     }
+
 
 }

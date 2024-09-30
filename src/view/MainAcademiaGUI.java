@@ -9,26 +9,24 @@ public class MainAcademiaGUI {
     private JPanel Painel;
 
     public MainAcademiaGUI() {
-        // Inicializa o botão (assumindo que você já o fez em seu arquivo .form)
-
-        // Adiciona o ActionListener para o botão
+        // Adiciona o ActionListener para o botão de login
         logarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Cria uma nova janela para a tela de login
                 JFrame loginFrame = new JFrame("Login");
-                LoginGUI homeGUI = new LoginGUI();  // Cria a tela Home LoginGUI
+                LoginGUI loginGUI = new LoginGUI();  // Cria a tela de login
 
                 // Define o painel da LoginGUI como o conteúdo da nova janela
-                loginFrame.setContentPane(homeGUI.getPanelMain());
+                loginFrame.setContentPane(loginGUI.getPanelMain());
                 loginFrame.setSize(600, 400);
                 loginFrame.setLocationRelativeTo(null); // Centraliza a janela
                 loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Fecha o aplicativo ao fechar a janela
                 loginFrame.setVisible(true);
 
-                // Opcional: Esconde a janela atual (MainAcademiaGUI)
+                // Fecha a janela atual (MainAcademiaGUI)
                 JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(Painel);
-                mainFrame.dispose(); // Ou use mainFrame.setVisible(false);
+                mainFrame.dispose();
             }
         });
 
@@ -38,11 +36,6 @@ public class MainAcademiaGUI {
         mainFrame.setSize(400, 300);
         mainFrame.setContentPane(Painel); // Usando o painel existente
         mainFrame.setLocationRelativeTo(null); // Centraliza a janela
-
-        // Adiciona o botão ao painel
-         // Certifique-se de que o botão já esteja no painel se foi criado no .form
-
-        // Exibe a janela principal
         mainFrame.setVisible(true);
     }
 
