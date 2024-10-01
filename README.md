@@ -1,4 +1,4 @@
-# GynSystem
+# GymSystem
 
 O GynSystem é um sistema de gerenciamento para academias, projetado para gerenciar alunos, personal trainers e aulas. Para iniciar o sistema, é necessário configurar o banco de dados no MySQL. 
 
