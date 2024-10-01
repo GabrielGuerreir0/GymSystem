@@ -3,22 +3,19 @@ package model;
 import java.sql.Date;
 
 public class Aluno extends Pessoa {
-    private Date dataInicio;  // Data de início do aluno na academia
-    private PersonalTrainer personal;  // Nome do personal trainer
-    private int idade;  // Idade do aluno
+    private Date dataInicio;
+    private PersonalTrainer personal;
+    private int idade;
     private Plano plano;  // Plano associado ao aluno
 
-    // Construtor que herda de Pessoa com parâmetros
     public Aluno(String nome, String CPF, String telefone, String email) {
         super(nome, CPF, telefone, email);
     }
 
-    // Construtor vazio
     public Aluno() {
-        super();  // Chama o construtor vazio da classe Pessoa
+        super();
     }
 
-    // Getters e Setters
     public Date getDataInicio() {
         return dataInicio;
     }
@@ -50,6 +47,4 @@ public class Aluno extends Pessoa {
     public void setPlano(Plano plano) {
         this.plano = plano;
     }
-
-
 }

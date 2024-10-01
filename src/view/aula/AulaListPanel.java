@@ -4,6 +4,7 @@ import dao.AulaDAO;
 import model.Aula;
 import view.aluno.AlunoListPanel;
 import view.personal.PersonalListPanel;
+import view.plano.PlanoListPanel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -30,11 +31,13 @@ public class AulaListPanel extends JPanel {
         JButton alunoButton = new JButton("Lista de Alunos");
         JButton personalButton = new JButton("Lista de Personais");
         JButton aulaButton = new JButton("Lista de Aulas");
+        JButton planoButton = new JButton("Lista de Planos"); // Botão de Lista de Planos
 
         // Adicionar os botões ao painel de navegação
         navPanel.add(alunoButton);
         navPanel.add(personalButton);
         navPanel.add(aulaButton);
+        navPanel.add(planoButton);
 
         // Adicionar o painel de navegação ao topo do layout
         add(navPanel, BorderLayout.NORTH);
@@ -43,6 +46,7 @@ public class AulaListPanel extends JPanel {
         alunoButton.addActionListener(e -> trocarParaAlunoList());
         personalButton.addActionListener(e -> trocarParaPersonalList());
         aulaButton.addActionListener(e -> trocarParaAulaList());
+        planoButton.addActionListener(e -> trocarParaPlanoList());
 
         // Criar painel de busca e tabela
         JPanel centerPanel = new JPanel();
@@ -171,6 +175,12 @@ public class AulaListPanel extends JPanel {
     private void trocarParaAulaList() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
         frame.setContentPane(new AulaListPanel());
+        frame.revalidate();
+    }
+    // Método para trocar para a tela de Lista de Planos
+    private void trocarParaPlanoList() {
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        frame.setContentPane(new PlanoListPanel());
         frame.revalidate();
     }
 

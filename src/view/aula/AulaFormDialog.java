@@ -14,19 +14,22 @@ import java.awt.*;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AulaFormDialog extends JDialog {
     private JTextField nomeAulaField, dataField, duracaoField, buscaAlunoField;
     private JComboBox<PersonalTrainer> personalComboBox;  // ComboBox para selecionar o Personal Trainer
-    private JList<Aluno> alunosList;  // Lista de alunos que serão adicionados à aula
-    private JList<Aluno> alunosDisponiveisList;  // Lista de alunos disponíveis para adicionar
-    private DefaultListModel<Aluno> alunosListModel;
-    private DefaultListModel<Aluno> alunosDisponiveisModel;
+    private JList<String> alunosList;  // Lista de alunos que serão adicionados à aula (exibe o nome)
+    private JList<String> alunosDisponiveisList;  // Lista de alunos disponíveis para adicionar (exibe o nome)
+    private DefaultListModel<String> alunosListModel;
+    private DefaultListModel<String> alunosDisponiveisModel;
+    private List<Aluno> alunosDisponiveis;  // Lista de alunos disponíveis completa (para controlar os IDs)
+    private List<Aluno> alunosNaAula;  // Lista de alunos já na aula
     private Aula aula;
     private AulaDAO aulaDAO;
     private boolean isCadastro;  // Para verificar se é um cadastro ou edição
-    private JButton adicionarAlunoButton; // Botão para adicionar mais alunos depois
+    private JButton adicionarAlunoButton; // Botão para adicionar alunos
     private JButton excluirAlunoButton; // Botão para excluir alunos da aula
 
     public AulaFormDialog(int aulaId, boolean isCadastro) {
@@ -157,42 +160,56 @@ public class AulaFormDialog extends JDialog {
     // Método para carregar alunos que já estão na aula
     private void carregarAlunosDaAula() {
         AlunoDAO alunoDAO = new AlunoDAO();
-        List<Aluno> alunosDaAula = alunoDAO.getAlunosByAulaId(aula.getId());
+        alunosNaAula = alunoDAO.getAlunosByAulaId(aula.getId());
         alunosListModel.clear();  // Limpar a lista de alunos associados
-        for (Aluno aluno : alunosDaAula) {
-            alunosListModel.addElement(aluno);  // Adicionar alunos à lista
+        for (Aluno aluno : alunosNaAula) {
+            alunosListModel.addElement(aluno.getNome());  // Adicionar nomes à lista de exibição
         }
     }
 
-    // Método para carregar alunos disponíveis, excluindo os já associados
+    // Método para carregar todos os alunos disponíveis, excluindo os já associados
     private void carregarAlunosDisponiveis() {
         AlunoDAO alunoDAO = new AlunoDAO();
-        List<Aluno> todosAlunos = alunoDAO.getAllAlunos();  // Buscar todos os alunos disponíveis
-        List<Aluno> alunosAssociados = alunoDAO.getAlunosByAulaId(aula.getId());  // Buscar alunos já na aula
+        alunosDisponiveis = alunoDAO.getAllAlunos();  // Buscar todos os alunos disponíveis
+        alunosNaAula = alunoDAO.getAlunosByAulaId(aula.getId());  // Buscar alunos já na aula
 
         alunosDisponiveisModel.clear();  // Limpar a lista de disponíveis
 
-        // Filtrar alunos que já estão na aula
-        for (Aluno aluno : todosAlunos) {
-            if (!alunosAssociados.contains(aluno)) {
-                alunosDisponiveisModel.addElement(aluno);  // Adicionar à lista de disponíveis
+        for (Aluno aluno : alunosDisponiveis) {
+            // Adicionar apenas alunos que não estão na aula
+            boolean associado = false;
+            for (Aluno alunoNaAula : alunosNaAula) {
+                if (aluno.getId() == alunoNaAula.getId()) {
+                    associado = true;
+                    break;
+                }
+            }
+            if (!associado) {
+                alunosDisponiveisModel.addElement(aluno.getNome());
             }
         }
     }
 
     // Método para adicionar aluno na aula
     private void adicionarAlunoNaAula() {
-        Aluno alunoSelecionado = alunosDisponiveisList.getSelectedValue();
-        if (alunoSelecionado != null && !alunosListModel.contains(alunoSelecionado)) {
-            alunosListModel.addElement(alunoSelecionado);  // Adicionar aluno à lista da aula
+        int selectedIndex = alunosDisponiveisList.getSelectedIndex();
+        if (selectedIndex != -1) {
+            Aluno alunoSelecionado = alunosDisponiveis.get(selectedIndex);
+            if (!alunosListModel.contains(alunoSelecionado.getNome())) {
+                alunosListModel.addElement(alunoSelecionado.getNome());  // Adicionar nome à lista de exibição
+                alunosNaAula.add(alunoSelecionado);  // Adicionar aluno à lista de controle
+                alunosDisponiveisModel.remove(selectedIndex);  // Remover da lista de disponíveis
+            }
         }
     }
 
     // Método para excluir aluno da aula
     private void excluirAlunoDaAula() {
-        Aluno alunoSelecionado = alunosList.getSelectedValue();
-        if (alunoSelecionado != null) {
-            alunosListModel.removeElement(alunoSelecionado);  // Remover aluno da lista da aula
+        int selectedIndex = alunosList.getSelectedIndex();
+        if (selectedIndex != -1) {
+            Aluno alunoRemovido = alunosNaAula.remove(selectedIndex);  // Remover da lista de controle
+            alunosListModel.remove(selectedIndex);  // Remover da lista de exibição
+            alunosDisponiveisModel.addElement(alunoRemovido.getNome());  // Adicionar de volta à lista de disponíveis
         }
     }
 
@@ -228,8 +245,7 @@ public class AulaFormDialog extends JDialog {
 
         // Atualizar os alunos da aula
         alunoDAO.excluirAlunosDaAula(aula.getId());
-        for (int i = 0; i < alunosListModel.size(); i++) {
-            Aluno aluno = alunosListModel.getElementAt(i);
+        for (Aluno aluno : alunosNaAula) {
             alunoDAO.addAlunoNaAula(aluno.getId(), aula.getId());
         }
 
@@ -241,13 +257,9 @@ public class AulaFormDialog extends JDialog {
         String filtro = buscaAlunoField.getText().trim().toLowerCase();
         alunosDisponiveisModel.clear();  // Limpar a lista de disponíveis
 
-        AlunoDAO alunoDAO = new AlunoDAO();
-        List<Aluno> todosAlunos = alunoDAO.getAllAlunos();
-        List<Aluno> alunosAssociados = alunoDAO.getAlunosByAulaId(aula.getId());
-
-        for (Aluno aluno : todosAlunos) {
-            if (!alunosAssociados.contains(aluno) && aluno.getNome().toLowerCase().contains(filtro)) {
-                alunosDisponiveisModel.addElement(aluno);
+        for (Aluno aluno : alunosDisponiveis) {
+            if (aluno.getNome().toLowerCase().contains(filtro)) {
+                alunosDisponiveisModel.addElement(aluno.getNome());  // Filtrar alunos por nome e adicionar à lista
             }
         }
     }

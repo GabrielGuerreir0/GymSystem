@@ -2,8 +2,10 @@ package view.aluno;
 
 import dao.AlunoDAO;
 import dao.PersonalTrainerDAO;
+import dao.PlanoDAO;
 import model.Aluno;
 import model.PersonalTrainer;
+import model.Plano;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,20 +17,21 @@ import java.util.List;
 public class AlunoFormDialog extends JDialog {
     private JTextField nomeField, cpfField, telefoneField, emailField, dataInicioField, idadeField;
     private JComboBox<PersonalTrainer> personalComboBox;  // ComboBox para selecionar o Personal Trainer
+    private JComboBox<Plano> planoComboBox;  // ComboBox para selecionar o Plano
     private Aluno aluno;
     private AlunoDAO alunoDAO;
-    private boolean isCadastro;  // Para verificar se é um cadastro ou edição
+    private boolean isCadastro;
 
     public AlunoFormDialog(int alunoId, boolean isCadastro) {
         this.isCadastro = isCadastro;
-        alunoDAO = new AlunoDAO(); // Instanciar o DAO
+        alunoDAO = new AlunoDAO();
+        PlanoDAO planoDAO = new PlanoDAO();  // DAO para carregar os planos
         setTitle(isCadastro ? "Cadastrar Aluno" : "Editar Aluno");
         setSize(400, 500);
         setLocationRelativeTo(null);
         setModal(true);
-        setLayout(new GridLayout(8, 2, 10, 10));
+        setLayout(new GridLayout(9, 2, 10, 10));
 
-        // Se não for cadastro, buscamos os dados do aluno no banco
         if (!isCadastro) {
             aluno = alunoDAO.getAlunoById(alunoId);
             if (aluno == null) {
@@ -37,7 +40,7 @@ public class AlunoFormDialog extends JDialog {
                 return;
             }
         } else {
-            aluno = new Aluno();  // Para cadastro de novo aluno
+            aluno = new Aluno();
         }
 
         // Campos de texto para informações do aluno
@@ -69,14 +72,26 @@ public class AlunoFormDialog extends JDialog {
         // ComboBox para selecionar o Personal Trainer
         add(new JLabel("Personal Trainer:"));
         personalComboBox = new JComboBox<>();
-        carregarPersonais();  // Preencher o ComboBox com os personais disponíveis
+        carregarPersonais();
         add(personalComboBox);
 
         if (!isCadastro) {
-            // Selecionar o personal trainer atual no combo box
             PersonalTrainer personal = aluno.getPersonal();
             if (personal != null) {
                 personalComboBox.setSelectedItem(personal);
+            }
+        }
+
+        // ComboBox para selecionar o Plano
+        add(new JLabel("Plano:"));
+        planoComboBox = new JComboBox<>();
+        carregarPlanos(planoDAO);
+        add(planoComboBox);
+
+        if (!isCadastro) {
+            Plano plano = aluno.getPlano();
+            if (plano != null) {
+                planoComboBox.setSelectedItem(plano);
             }
         }
 
@@ -96,7 +111,15 @@ public class AlunoFormDialog extends JDialog {
         PersonalTrainerDAO personalDAO = new PersonalTrainerDAO();
         List<PersonalTrainer> personalTrainers = personalDAO.getAllPersonalTrainers();
         for (PersonalTrainer personal : personalTrainers) {
-            personalComboBox.addItem(personal);  // Carregar os personais no ComboBox
+            personalComboBox.addItem(personal);
+        }
+    }
+
+    // Método para carregar os planos no ComboBox
+    private void carregarPlanos(PlanoDAO planoDAO) {
+        List<Plano> planos = planoDAO.getAllPlanos();
+        for (Plano plano : planos) {
+            planoComboBox.addItem(plano);
         }
     }
 
@@ -121,16 +144,18 @@ public class AlunoFormDialog extends JDialog {
         PersonalTrainer personal = (PersonalTrainer) personalComboBox.getSelectedItem();
         aluno.setPersonal(personal);
 
+        // Obter o plano selecionado no ComboBox
+        Plano plano = (Plano) planoComboBox.getSelectedItem();
+        aluno.setPlano(plano);
+
         if (isCadastro) {
-            // Adicionar novo aluno no banco de dados
             alunoDAO.addAluno(aluno);
             JOptionPane.showMessageDialog(this, "Aluno cadastrado com sucesso!");
         } else {
-            // Atualizar aluno existente no banco de dados
             alunoDAO.updateAluno(aluno);
             JOptionPane.showMessageDialog(this, "Aluno atualizado com sucesso!");
         }
 
-        dispose();  // Fechar o dialog após salvar
+        dispose();
     }
 }

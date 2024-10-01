@@ -12,6 +12,9 @@ public class Plano {
         this.descricao = descricao;
     }
 
+    public Plano() {
+    }
+
     public int getId() {
         return id;
     }
@@ -42,5 +45,10 @@ public class Plano {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    @Override
+    public String toString() {
+        return tipo;  // Exibir o tipo do plano no ComboBox
     }
 }
