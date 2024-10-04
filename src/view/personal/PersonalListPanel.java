@@ -20,143 +20,179 @@ public class PersonalListPanel extends JPanel {
     private JTextField searchField;
 
     public PersonalListPanel() {
-        personalTrainerDAO = new PersonalTrainerDAO(); // Instanciar o DAO para acesso ao banco de dados
-        setLayout(new BorderLayout());
+        personalTrainerDAO = new PersonalTrainerDAO();
+        setLayout(new BorderLayout(10, 10)); // Adicionar espaçamento geral entre os componentes
 
-        // Criar o painel de navegação personalizado com botões
+        // Estilização do painel de navegação
         JPanel navPanel = new JPanel();
-        navPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Alinhar os botões de navegação à esquerda
+        navPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Espaçamento entre os botões
+        navPanel.setBackground(new Color(13, 12, 22)); // Fundo escuro
+        navPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Adicionar espaçamento em torno do painel de navegação
 
-        // Botões de navegação
-        JButton alunoButton = new JButton("Lista de Alunos");
-        JButton personalButton = new JButton("Lista de Personais");
-        JButton aulaButton = new JButton("Lista de Aulas");
-        JButton planoButton = new JButton("Lista de Planos"); // Botão de Lista de Planos
+        // Botões de navegação estilizados
+        JButton alunoButton = criarBotaoNavegacao("Lista de Alunos");
+        JButton personalButton = criarBotaoNavegacao("Lista de Personais");
+        JButton aulaButton = criarBotaoNavegacao("Lista de Aulas");
+        JButton planoButton = criarBotaoNavegacao("Lista de Planos");
 
-
-        // Adicionar os botões ao painel de navegação
         navPanel.add(alunoButton);
         navPanel.add(personalButton);
         navPanel.add(aulaButton);
         navPanel.add(planoButton);
-        // Adicionar o painel de navegação ao topo do layout
+
         add(navPanel, BorderLayout.NORTH);
 
-        // Adicionar ações para alternar entre as telas
+        // Ações para alternar entre as telas
         alunoButton.addActionListener(e -> trocarParaAlunoList());
         personalButton.addActionListener(e -> trocarParaPersonalList());
         aulaButton.addActionListener(e -> trocarParaAulaList());
         planoButton.addActionListener(e -> trocarParaPlanoList());
 
-        // Criar painel de busca e tabela
+        // Painel central para campo de busca e tabela
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BorderLayout());
+        centerPanel.setLayout(new BorderLayout(10, 10)); // Espaçamento interno
+        centerPanel.setBackground(new Color(13, 12, 22)); // Fundo escuro
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Adicionar espaçamento em torno do painel central
 
-        // Painel para o campo de busca
-        JPanel searchPanel = new JPanel(new BorderLayout());
+        // Campo de busca estilizado
+        JPanel searchPanel = new JPanel(new BorderLayout(10, 10)); // Espaçamento entre o label e o campo de busca
+        searchPanel.setBackground(new Color(13, 12, 22));  // Fundo escuro
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Espaçamento ao redor do campo de busca
+
         searchField = new JTextField();
-        searchPanel.add(new JLabel("Buscar por Nome: "), BorderLayout.WEST);
+        searchField.setPreferredSize(new Dimension(300, 30));
+        searchField.setBackground(new Color(192, 192, 192));  // Cor de fundo do campo de busca ajustada
+        searchField.setForeground(Color.BLACK);
+        searchField.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding interno no campo de busca
+
+        // Estilizar label de busca
+        JLabel searchLabel = new JLabel("Buscar por Nome: ");
+        searchLabel.setForeground(new Color(216, 132, 16)); // Amarelo
+        searchPanel.add(searchLabel, BorderLayout.WEST);
         searchPanel.add(searchField, BorderLayout.CENTER);
 
-        // Adicionar o painel de busca ao centro
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
-        // Adicionar um DocumentListener para atualizar a tabela a cada letra digitada
+        // Atualizar a tabela a cada letra digitada
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                atualizarLista();  // Atualizar a tabela quando uma letra for inserida
-            }
-
+            public void insertUpdate(DocumentEvent e) { atualizarLista(); }
             @Override
-            public void removeUpdate(DocumentEvent e) {
-                atualizarLista();  // Atualizar a tabela quando uma letra for removida
-            }
-
+            public void removeUpdate(DocumentEvent e) { atualizarLista(); }
             @Override
-            public void changedUpdate(DocumentEvent e) {
-                atualizarLista();  // Atualizar a tabela para mudanças no estilo (não aplicável ao texto simples)
-            }
+            public void changedUpdate(DocumentEvent e) { atualizarLista(); }
 
             private void atualizarLista() {
-                carregarDados(searchField.getText());  // Recarregar os dados filtrados por nome
+                carregarDados(searchField.getText());
             }
         });
 
-        // Criar modelo da tabela (não editável)
+        // Tabela estilizada
         tableModel = new DefaultTableModel(new Object[]{"ID", "Nome", "Registro Profissional", "Especialidade"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;  // Todas as células são não editáveis
+                return false;
             }
         };
 
-        // Criar a tabela
         table = new JTable(tableModel);
-        table.getTableHeader().setReorderingAllowed(false);  // Impedir que o usuário reorganize as colunas
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  // Permitir selecionar apenas uma linha por vez
-
+        table.getTableHeader().setBackground(new Color(13, 12, 22));
+        table.getTableHeader().setForeground(new Color(216, 132, 16));  // Estilo do cabeçalho da tabela
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  // Seleção única
+        table.setBackground(new Color(44, 44, 44)); // Cor de fundo ajustada da tabela
+        table.setForeground(Color.WHITE);  // Cor das células
+        table.setRowHeight(25);  // Ajuste da altura das linhas para maior legibilidade
         JScrollPane scrollPane = new JScrollPane(table);
-        centerPanel.add(scrollPane, BorderLayout.CENTER);  // Adicionar a tabela na parte central do centro
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(216, 132, 16), 1));  // Borda amarela ao redor da tabela
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Adicionar o painel central (busca + tabela) ao layout
         add(centerPanel, BorderLayout.CENTER);
 
-        // Botões para ações adicionais
+        // Painel de botões de ação estilizados
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Cadastrar Personal");
-        JButton deleteButton = new JButton("Excluir Personal");
+        buttonPanel.setBackground(new Color(13, 12, 22));  // Fundo escuro
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10)); // Adicionar espaçamento entre os botões
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Espaçamento ao redor dos botões
+
+        JButton addButton = criarBotaoAcao("Cadastrar Personal", new Color(137, 227, 119));
+        JButton deleteButton = criarBotaoAcao("Excluir Personal", new Color(241, 92, 92));
 
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        add(buttonPanel, BorderLayout.SOUTH); // Adicionar o painel de botões ao sul
-
-        // Ação para abrir a janela de cadastro ao clicar no botão
+        // Ação de cadastrar novo personal
         addButton.addActionListener(e -> {
-            // Abrir o formulário para cadastrar novo personal
-            PersonalFormDialog dialog = new PersonalFormDialog(-1, true);  // -1 significa que é um novo personal
+            PersonalFormDialog dialog = new PersonalFormDialog(-1, true);
             dialog.setVisible(true);
-            carregarDados(searchField.getText());  // Recarregar os dados após adicionar um novo personal
+            carregarDados(searchField.getText());
         });
 
-        // Ação para excluir personal selecionado
+        // Ação de excluir personal selecionado
         deleteButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
             if (selectedRow != -1) {
                 int personalId = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
-
                 int confirm = JOptionPane.showConfirmDialog(null,
                         "Tem certeza que deseja excluir o personal selecionado?",
                         "Confirmação de Exclusão",
                         JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    personalTrainerDAO.deletePersonalTrainer(personalId);  // Excluir o personal do banco
-                    carregarDados(searchField.getText());  // Atualizar a tabela após a exclusão
+                    personalTrainerDAO.deletePersonalTrainer(personalId);
+                    carregarDados(searchField.getText());
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Por favor, selecione um personal para excluir.");
             }
         });
 
-        // Detectar duplo clique para abrir a janela de edição
+        // Ação para editar personal ao dar duplo clique
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
                     int selectedRow = table.getSelectedRow();
                     int personalId = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
-
-                    // Abrir o dialog de edição (janela separada)
                     PersonalFormDialog dialog = new PersonalFormDialog(personalId, false);
                     dialog.setVisible(true);
-                    carregarDados(searchField.getText());  // Recarregar os dados após possível edição
+                    carregarDados(searchField.getText());
                 }
             }
         });
 
-        // Preencher a tabela com dados do banco de dados
+        // Carregar dados iniciais
         carregarDados("");
+    }
+
+    // Método para criar botões de navegação
+    private JButton criarBotaoNavegacao(String texto) {
+        JButton botao = new JButton(texto);
+        botao.setBackground(new Color(13, 12, 22));  // Fundo escuro
+        botao.setForeground(new Color(216, 132, 16));  // Amarelo
+        botao.setFocusPainted(false);
+        botao.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botao.setPreferredSize(new Dimension(160, 40)); // Aumentar o tamanho dos botões
+        return botao;
+    }
+
+    // Método para criar botões de ação
+    private JButton criarBotaoAcao(String texto, Color corFundo) {
+        JButton botao = new JButton(texto);
+        botao.setBackground(corFundo);
+        botao.setForeground(Color.BLACK);
+        botao.setPreferredSize(new Dimension(160, 40));  // Aumentar tamanho do botão para caber o texto completo
+        botao.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botao.setFocusPainted(false);
+        return botao;
+    }
+
+    private void carregarDados(String nome) {
+        tableModel.setRowCount(0);
+
+        List<PersonalTrainer> personalTrainers = personalTrainerDAO.getPersonalTrainersByName(nome);
+        for (PersonalTrainer personal : personalTrainers) {
+            tableModel.addRow(new Object[]{personal.getId(), personal.getNome(), personal.getRegistroProfissional(), personal.getEspecialidade()});
+        }
     }
 
     // Métodos para alternar entre as telas
@@ -177,20 +213,10 @@ public class PersonalListPanel extends JPanel {
         frame.setContentPane(new AulaListPanel());
         frame.revalidate();
     }
-    // Método para trocar para a tela de Lista de Planos
+
     private void trocarParaPlanoList() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
         frame.setContentPane(new PlanoListPanel());
         frame.revalidate();
-    }
-
-    // Método para carregar os dados da lista de personais
-    private void carregarDados(String nome) {
-        tableModel.setRowCount(0);  // Limpar a tabela antes de carregar os dados
-
-        List<PersonalTrainer> personalTrainers = personalTrainerDAO.getPersonalTrainersByName(nome);
-        for (PersonalTrainer personal : personalTrainers) {
-            tableModel.addRow(new Object[]{personal.getId(), personal.getNome(), personal.getRegistroProfissional(), personal.getEspecialidade()});
-        }
     }
 }

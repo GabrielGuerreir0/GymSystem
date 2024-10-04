@@ -17,66 +17,77 @@ public class PlanoListPanel extends JPanel {
 
     public PlanoListPanel() {
         planoDAO = new PlanoDAO();
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10)); // Adicionar espaçamento geral entre os componentes
 
         // Criar o painel de navegação personalizado com botões
         JPanel navPanel = new JPanel();
-        navPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Alinhar os botões de navegação à esquerda
+        navPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Espaçamento entre os botões de navegação
+        navPanel.setBackground(new Color(13, 12, 22)); // Fundo escuro
+        navPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Espaçamento ao redor do painel de navegação
 
-        // Botões de navegação
-        JButton alunoButton = new JButton("Lista de Alunos");
-        JButton personalButton = new JButton("Lista de Personais");
-        JButton aulaButton = new JButton("Lista de Aulas");
-        JButton planoButton = new JButton("Lista de Planos"); // Adicionar o botão para a lista de planos
+        // Botões de navegação estilizados
+        JButton alunoButton = criarBotaoNavegacao("Lista de Alunos");
+        JButton personalButton = criarBotaoNavegacao("Lista de Personais");
+        JButton aulaButton = criarBotaoNavegacao("Lista de Aulas");
+        JButton planoButton = criarBotaoNavegacao("Lista de Planos");
 
-        // Adicionar os botões ao painel de navegação
         navPanel.add(alunoButton);
         navPanel.add(personalButton);
         navPanel.add(aulaButton);
-        navPanel.add(planoButton); // Adicionar o botão de planos ao painel de navegação
+        navPanel.add(planoButton);
 
-        // Adicionar o painel de navegação ao topo do layout
         add(navPanel, BorderLayout.NORTH);
 
-        // Adicionar ações para alternar entre as telas
+        // Ações de navegação
         alunoButton.addActionListener(e -> trocarParaAlunoList());
         personalButton.addActionListener(e -> trocarParaPersonalList());
         aulaButton.addActionListener(e -> trocarParaAulaList());
-        planoButton.addActionListener(e -> trocarParaPlanoList()); // Ação para alternar para o painel de lista de planos
+        planoButton.addActionListener(e -> trocarParaPlanoList());
 
         // Lista de planos com um ListCellRenderer personalizado
         planosListModel = new DefaultListModel<>();
         planosList = new JList<>(planosListModel);
+        planosList.setFont(new Font("SansSerif", Font.PLAIN, 14)); // Fonte mais limpa para a lista
+        planosList.setBackground(Color.WHITE); // Cor de fundo branca
+        planosList.setBorder(BorderFactory.createLineBorder(new Color(200, 221, 242), 1)); // Borda leve
 
         // Definir o ListCellRenderer para mostrar o tipo do plano
         planosList.setCellRenderer(new ListCellRenderer<Plano>() {
             @Override
             public Component getListCellRendererComponent(JList<? extends Plano> list, Plano value, int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel label = new JLabel(value.getTipo()); // Mostrar o tipo do plano
+                JLabel label = new JLabel(value.getTipo(), JLabel.LEFT);
+                label.setFont(new Font("SansSerif", Font.BOLD, 14)); // Negrito no tipo do plano
+                label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding interno
                 if (isSelected) {
-                    label.setBackground(list.getSelectionBackground());
-                    label.setForeground(list.getSelectionForeground());
-                    label.setOpaque(true); // Para o fundo ser visível
+                    label.setBackground(new Color(0, 153, 204)); // Azul para o item selecionado
+                    label.setForeground(Color.WHITE);
+                    label.setOpaque(true);
                 } else {
-                    label.setBackground(list.getBackground());
-                    label.setForeground(list.getForeground());
+                    label.setBackground(Color.WHITE); // Fundo branco para itens não selecionados
+                    label.setForeground(Color.BLACK);
                 }
                 return label;
             }
         });
 
         JScrollPane scrollPane = new JScrollPane(planosList);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Planos"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // Botões de ação
+        // Painel de botões de ação
         JPanel buttonsPanel = new JPanel();
-        JButton adicionarButton = new JButton("Adicionar Plano");
-        JButton editarButton = new JButton("Editar Plano");
-        JButton excluirButton = new JButton("Excluir Plano");
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10)); // Espaçamento entre os botões
+        buttonsPanel.setBackground(new Color(13, 12, 22)); // Fundo escuro
+        buttonsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Adicionar borda ao redor dos botões
+
+        JButton adicionarButton = criarBotaoAcao("Adicionar Plano", new Color(137, 227, 119));
+        JButton editarButton = criarBotaoAcao("Editar Plano", new Color(255, 204, 102));
+        JButton excluirButton = criarBotaoAcao("Excluir Plano", new Color(241, 92, 92));
 
         buttonsPanel.add(adicionarButton);
         buttonsPanel.add(editarButton);
         buttonsPanel.add(excluirButton);
+
         add(buttonsPanel, BorderLayout.SOUTH);
 
         // Carregar lista de planos
@@ -97,8 +108,11 @@ public class PlanoListPanel extends JPanel {
         excluirButton.addActionListener(e -> {
             Plano planoSelecionado = planosList.getSelectedValue();
             if (planoSelecionado != null) {
-                planoDAO.deletePlano(planoSelecionado.getId());
-                carregarPlanos();
+                int resposta = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir?", "Confirmação", JOptionPane.YES_NO_OPTION);
+                if (resposta == JOptionPane.YES_OPTION) {
+                    planoDAO.deletePlano(planoSelecionado.getId());
+                    carregarPlanos();
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Selecione um plano para excluir.");
             }
@@ -111,6 +125,28 @@ public class PlanoListPanel extends JPanel {
         for (Plano plano : planos) {
             planosListModel.addElement(plano);
         }
+    }
+
+    // Método para criar botões de navegação
+    private JButton criarBotaoNavegacao(String texto) {
+        JButton botao = new JButton(texto);
+        botao.setBackground(new Color(13, 12, 22));  // Fundo escuro
+        botao.setForeground(new Color(216, 132, 16));  // Amarelo
+        botao.setFocusPainted(false);
+        botao.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botao.setPreferredSize(new Dimension(160, 40)); // Aumentar o tamanho dos botões
+        return botao;
+    }
+
+    // Método para criar botões de ação
+    private JButton criarBotaoAcao(String texto, Color corFundo) {
+        JButton botao = new JButton(texto);
+        botao.setBackground(corFundo);
+        botao.setForeground(Color.BLACK);
+        botao.setPreferredSize(new Dimension(160, 40));  // Aumentar tamanho do botão para caber o texto completo
+        botao.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botao.setFocusPainted(false);
+        return botao;
     }
 
     // Métodos para alternar entre as telas
@@ -134,7 +170,7 @@ public class PlanoListPanel extends JPanel {
 
     private void trocarParaPlanoList() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        frame.setContentPane(new PlanoListPanel());  // Trocar para o painel de lista de planos
+        frame.setContentPane(new PlanoListPanel());
         frame.revalidate();
     }
 }

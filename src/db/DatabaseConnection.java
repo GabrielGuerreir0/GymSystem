@@ -1,6 +1,6 @@
 package db;
 
-import javax.naming.NamingException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
