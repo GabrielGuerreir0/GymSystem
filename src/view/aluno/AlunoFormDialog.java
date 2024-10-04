@@ -26,6 +26,19 @@ public class AlunoFormDialog extends JDialog {
         this.isCadastro = isCadastro;
         alunoDAO = new AlunoDAO();
         PlanoDAO planoDAO = new PlanoDAO();
+
+        // Inicializar o objeto `aluno`
+        if (!isCadastro) {
+            aluno = alunoDAO.getAlunoById(alunoId);  // Buscar o aluno do banco se for uma edição
+            if (aluno == null) {
+                JOptionPane.showMessageDialog(this, "Erro: Aluno não encontrado!");
+                dispose();
+                return;
+            }
+        } else {
+            aluno = new Aluno();  // Inicializar um novo aluno se for um cadastro
+        }
+
         setTitle(isCadastro ? "Cadastrar Aluno" : "Editar Aluno");
         setSize(600, 600);  // Aumentado o tamanho geral da janela
         setLocationRelativeTo(null);
@@ -77,6 +90,7 @@ public class AlunoFormDialog extends JDialog {
         add(formPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
     }
+
 
     // Método para criar labels estilizados
     private JLabel criarLabel(String texto) {

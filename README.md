@@ -6,7 +6,8 @@ O GynSystem é um sistema de gerenciamento para academias, projetado para gerenc
 
 - MySQL instalado e configurado em seu sistema.
 - Acesso ao MySQL com permissões para criar bancos de dados e tabelas.
-
+- Instalação do mysql conector em caso de erro na conexão do banco.
+- alteração nos campos USER e PASSWORD no arquivo DatabaseConnection
 ## Configuração do Banco de Dados
 
 Siga as instruções abaixo para criar o banco de dados e as tabelas necessárias:
@@ -108,5 +109,3 @@ INSERT INTO aula_aluno (aula_id, aluno_id) VALUES
 (1, 3), -- Ana participa da aula de Musculação Avançada
 (2, 4); -- Carlos participa da aula de Yoga para Iniciantes
 ```
-Você pode personalizar o conteúdo conforme necessário, mas isso deve fornecer uma boa base para o seu `README.md`.
-

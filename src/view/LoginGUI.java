@@ -17,7 +17,7 @@ public class LoginGUI {
     public LoginGUI() {
         // Carregar a logo e definir no JLabel
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource("../images/Captura de tela 2023-11-27 075813.png"));
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("../images/logo.jpeg"));
             Image originalImage = originalIcon.getImage();
             // Redimensiona a imagem (exemplo para 100x100 pixels)
             Image resizedImage = originalImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
